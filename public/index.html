@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolarScope — Explore the Solar System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="site-title">🌌 SolarScope</h1>
+                <p class="site-subtitle">Explore the Solar System</p>
+                <nav class="main-nav">
+                    <a href="#home" class="nav-link active" aria-label="Home">Home</a>
+                    <a href="#objects" class="nav-link" aria-label="Objects">Objects</a>
+                    <a href="#about" class="nav-link" aria-label="About">About</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Row 1: Solar System -->
+            <div class="solar-system-row">
+                <div class="canvas-container">
+                    <canvas id="solarCanvas" tabindex="0" aria-label="Interactive 3D Solar System"></canvas>
+                    
+                    <!-- Loading Indicator -->
+                    <div class="loading-indicator" id="loadingIndicator">
+                        <div class="spinner"></div>
+                        <p>Loading Solar System...</p>
+                    </div>
+
+                    <!-- Controls Help -->
+                    <div class="controls-help">
+                        <p><strong>Timeline Navigation:</strong> Drag left/right to explore • Scroll to zoom • Click planets for details</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Object Info -->
+            <div class="object-info-row">
+                <div class="object-info-container" id="rightPanel">
+                    <div class="panel-header">
+                        <div class="header-left">
+                            <h2>Object Info</h2>
+                            <div class="object-title-inline">
+                                <span class="object-name-inline"></span>
+                                <span class="object-type-inline"></span>
+                            </div>
+                        </div>
+                        <button class="panel-close" id="panelClose" aria-label="Close info panel">×</button>
+                    </div>
+                    
+                    <div class="info-content" id="infoContent">
+                        <!-- Object details populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: AI Assistant -->
+            <div class="ai-assistant-row">
+                <div class="ai-question-section">
+                    <div class="ai-content-container">
+                        <!-- Left Column: Question Input -->
+                        <div class="ai-left-column">
+                            <h4>Ask a Question</h4>
+                            <div class="question-input-container">
+                                <input type="text" id="questionInput" placeholder="Ask me anything about planets, space, or astronomy..." maxlength="200">
+                                <button id="askButton" class="ask-btn">Ask AI</button>
+                            </div>
+                            <div id="loadingResponse" class="loading-response" style="display: none;">
+                                <div class="spinner-small"></div>
+                                <span>Thinking...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column: AI Response -->
+                        <div class="ai-right-column">
+                            <h4>AI Response</h4>
+                            <div class="ai-response-container">
+                                <div id="aiResponse" class="ai-response" style="display: none;">
+                                    <div id="responseText" class="response-text"></div>
+                                </div>
+                                <div class="ai-placeholder" id="aiPlaceholder">
+                                    <p>Ask a question to see the AI response here...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="attribution">
+                    <p>Data sources: 
+                        <a href="https://nasa.gov" target="_blank" rel="noopener">NASA</a> • 
+                        <a href="https://jpl.nasa.gov" target="_blank" rel="noopener">JPL</a> • 
+                        <a href="https://esa.int" target="_blank" rel="noopener">ESA</a>
+                    </p>
+                    <p>Powered by: 
+                        <a href="https://openai.com" target="_blank" rel="noopener">OpenAI</a> • 
+                        <a href="https://ai.google.dev" target="_blank" rel="noopener">Google Gemini</a> • 
+                        <a href="https://threejs.org" target="_blank" rel="noopener">Three.js</a>
+                    </p>
+                </div>
+                <div class="footer-info">
+                    <p>&copy; 2024 SolarScope. Educational use only.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Object Detail Modal Template -->
+    <template id="objectDetailTemplate">
+        <div class="object-detail-three-columns">
+            <!-- Column 1: Distance Facts & Basic Info -->
+            <div class="object-column-1">
+                <div class="distance-facts">
+                    <h4>Distance & Physical Facts</h4>
+                    <div class="object-stats-list">
+                        <div class="stat-item">
+                            <span class="stat-label">Distance from Earth:</span>
+                            <span class="stat-value distance"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Radius:</span>
+                            <span class="stat-value radius"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Rotation Period:</span>
+                            <span class="stat-value rotation"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Orbital Period:</span>
+                            <span class="stat-value orbital-period"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Orbital Speed:</span>
+                            <span class="stat-value orbital-speed"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 2: Interesting Facts -->
+            <div class="object-column-2">
+                <div class="interesting-facts">
+                    <h4>Interesting Facts</h4>
+                    <ul class="facts-list"></ul>
+                </div>
+            </div>
+
+            <!-- Column 3: AI Assist Buttons & Generated Image -->
+            <div class="object-column-3">
+                <div class="ai-assist-section">
+                    <h4>AI Assistance</h4>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="generateImage">
+                            <span class="btn-icon">🖼️</span>
+                            Generate Image
+                        </button>
+                        <button class="btn btn-secondary" id="moreInfo">
+                            <span class="btn-icon">📖</span>
+                            More Info
+                        </button>
+                    </div>
+
+                    <div class="generated-image" id="generatedImage" style="display: none;">
+                        <h4>AI Generated Visualization</h4>
+                        <img src="" alt="AI generated visualization" class="ai-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="enhanced-planets.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
