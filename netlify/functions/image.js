@@ -1,3 +1,5 @@
+const { request } = require('undici');
+
 exports.handler = async (event, context) => {
   // Handle CORS
   const headers = {
@@ -34,15 +36,66 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // For now, return a placeholder response since DALL-E requires API keys
-    // You can add your OpenAI API key as a Netlify environment variable later
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    
+    if (!openaiApiKey) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'OpenAI API key not configured in environment variables.',
+          imageUrl: null
+        })
+      };
+    }
+
+    console.log(`🎨 Generating image for: ${objectName}`);
+
+    // Create a detailed prompt for the celestial object
+    const prompt = `A stunning, realistic space photograph of ${objectName} in our solar system. High-resolution, scientifically accurate, beautiful cosmic photography with deep space background, stars, and nebulae. Professional astronomy photography style, vibrant colors, detailed surface features visible.`;
+
+    const dalleResponse = await request('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: prompt,
+        n: 1,
+        size: "1024x1024",
+        quality: "standard",
+        response_format: "url"
+      })
+    });
+
+    const dalleData = await dalleResponse.body.json();
+
+    if (dalleResponse.statusCode !== 200) {
+      console.error('DALL-E API Error:', dalleData);
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: `Failed to generate image: ${dalleData.error?.message || 'Unknown error'}`,
+          imageUrl: null
+        })
+      };
+    }
+
+    const imageUrl = dalleData.data[0].url;
+    console.log(`✅ Image generated successfully: ${imageUrl}`);
+
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        success: false,
-        message: `Image generation for ${objectName} is currently unavailable. Please configure OpenAI API key in Netlify environment variables.`,
-        imageUrl: null
+        success: true,
+        message: `Generated image for ${objectName}`,
+        imageUrl: imageUrl
       })
     };
 
@@ -51,7 +104,11 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Internal server error' })
+      body: JSON.stringify({ 
+        success: false,
+        message: 'Internal server error while generating image',
+        imageUrl: null
+      })
     };
   }
 };
