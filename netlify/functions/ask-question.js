@@ -79,7 +79,9 @@ exports.handler = async (event, context) => {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-              response: aiResponse,
+              success: true,
+              answer: aiResponse,
+              response: aiResponse, // Keep for backward compatibility
               sources: ["OpenAI GPT-3.5", "Astronomical Knowledge Base"]
             })
           };
@@ -126,7 +128,9 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        response: response,
+        success: true,
+        answer: response,
+        response: response, // Keep for backward compatibility
         sources: ["General Astronomical Knowledge", "NASA Educational Resources"]
       })
     };
@@ -137,6 +141,8 @@ exports.handler = async (event, context) => {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
+        success: false,
+        answer: 'Sorry, I encountered an error while processing your question. Please try again.',
         error: 'Internal server error',
         message: 'Sorry, I encountered an error while processing your question. Please try again.'
       })
