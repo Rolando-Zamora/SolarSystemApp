@@ -1270,28 +1270,57 @@ class SolarSystem {
       orbitalPeriodEl.textContent = 'Loading...';
       orbitalSpeedEl.textContent = 'Loading...';
       
-      // Fetch data from API
-      try {
-        const response = await fetch('/api/text', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ objectName: data.name })
-        });
-        objectData = await response.json();
-        this.saveToCache(cacheKey, objectData);
-      } catch (error) {
-        console.error('Error fetching object data:', error);
-        objectData = {
-          name: data.name,
-          type: data.type,
-          distanceFromEarth_km: 'Unknown',
-          radius_km: 'Unknown',
-          rotation_period_hours: 'Unknown',
-          orbital_period_days: 'Unknown',
-          orbital_speed_kms: 'Unknown',
-          interesting_facts: ['Data temporarily unavailable'],
-          sources: ['Local database']
-        };
+      // Fetch data from API with retry logic
+      let retryCount = 0;
+      const maxRetries = 2;
+      
+      while (retryCount <= maxRetries) {
+        try {
+          console.log(`🔄 Fetching data for ${data.name} (attempt ${retryCount + 1})`);
+          
+          const response = await fetch('/api/text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ objectName: data.name })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          objectData = await response.json();
+          
+          // Validate that we got proper data
+          if (objectData && objectData.distanceFromEarth_km && objectData.distanceFromEarth_km !== 'Unknown') {
+            console.log(`✅ Successfully fetched data for ${data.name}`);
+            this.saveToCache(cacheKey, objectData);
+            break; // Success, exit retry loop
+          } else {
+            throw new Error('Received invalid or incomplete data from API');
+          }
+          
+        } catch (error) {
+          console.error(`❌ Error fetching object data (attempt ${retryCount + 1}):`, error);
+          retryCount++;
+          
+          if (retryCount <= maxRetries) {
+            console.log(`⏳ Retrying in 1 second...`);
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+          } else {
+            console.error(`💥 All retry attempts failed for ${data.name}`);
+            objectData = {
+              name: data.name,
+              type: data.type,
+              distanceFromEarth_km: 'Unknown',
+              radius_km: 'Unknown',
+              rotation_period_hours: 'Unknown',
+              orbital_period_days: 'Unknown',
+              orbital_speed_kms: 'Unknown',
+              interesting_facts: ['Data temporarily unavailable. Click "More Info" to retry.'],
+              sources: ['Local database']
+            };
+          }
+        }
       }
     }
     

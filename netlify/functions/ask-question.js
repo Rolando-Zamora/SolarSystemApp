@@ -59,12 +59,12 @@ exports.handler = async (event, context) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: "gpt-3.5-turbo",
+            model: "gpt-4o-mini",
             messages: [
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt }
             ],
-            max_tokens: 150,
+            max_tokens: 175, //adjust for more concise or longer responses
             temperature: 0.7
           })
         });
@@ -82,7 +82,7 @@ exports.handler = async (event, context) => {
               success: true,
               answer: aiResponse,
               response: aiResponse, // Keep for backward compatibility
-              sources: ["OpenAI GPT-3.5", "Astronomical Knowledge Base"]
+              sources: ["OpenAI gpt-4o-mini", "Astronomical Knowledge Base"]
             })
           };
         } else {

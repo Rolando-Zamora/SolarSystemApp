@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({
           success: false,
           message: 'OpenAI API key not configured in environment variables.',
-          imageUrl: null
+          image: null
         })
       };
     }
@@ -81,7 +81,7 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({
           success: false,
           message: `Failed to generate image: ${dalleData.error?.message || 'Unknown error'}`,
-          imageUrl: null
+          image: null
         })
       };
     }
@@ -95,7 +95,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         message: `Generated image for ${objectName}`,
-        imageUrl: imageUrl
+        image: imageUrl
       })
     };
 
@@ -107,7 +107,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ 
         success: false,
         message: 'Internal server error while generating image',
-        imageUrl: null
+        image: null
       })
     };
   }
