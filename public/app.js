@@ -1308,14 +1308,22 @@ class SolarSystem {
             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
           } else {
             console.error(`💥 All retry attempts failed for ${data.name}`);
+            // Use default values from solarSystemData as fallback
+            let fallbackDistance;
+            if (key === 'sun') {
+              fallbackDistance = '149600000'; // Sun is ~149.6 million km from Earth
+            } else {
+              fallbackDistance = data.distance ? (data.distance * 149597870.7).toFixed(0) : 'Unknown'; // Convert AU to km
+            }
+            
             objectData = {
               name: data.name,
               type: data.type,
-              distanceFromEarth_km: 'Unknown',
-              radius_km: 'Unknown',
-              rotation_period_hours: 'Unknown',
-              orbital_period_days: 'Unknown',
-              orbital_speed_kms: 'Unknown',
+              distanceFromEarth_km: fallbackDistance,
+              radius_km: data.radius || 'Unknown',
+              rotation_period_hours: data.rotationSpeed ? (24 / data.rotationSpeed).toFixed(1) : 'Unknown',
+              orbital_period_days: data.orbitSpeed ? (365 / data.orbitSpeed).toFixed(0) : 'Unknown',
+              orbital_speed_kms: data.orbitSpeed ? (data.orbitSpeed * 30).toFixed(1) : 'Unknown', // Approximate conversion
               interesting_facts: ['Data temporarily unavailable. Click "More Info" to retry.'],
               sources: ['Local database']
             };
@@ -1332,12 +1340,54 @@ class SolarSystem {
       return num.toLocaleString();
     };
 
-    // Update with fetched data (with comma formatting)
-    distanceEl.textContent = `${formatNumber(objectData.distanceFromEarth_km)} km`;
-    radiusEl.textContent = `${formatNumber(objectData.radius_km)} km`;
-    rotationEl.textContent = `${formatNumber(objectData.rotation_period_hours)} hours`;
-    orbitalPeriodEl.textContent = `${formatNumber(objectData.orbital_period_days)} days`;
-    orbitalSpeedEl.textContent = `${formatNumber(objectData.orbital_speed_kms)} km/s`;
+    // Helper function to get fallback value from solarSystemData
+    const getFallbackValue = (apiValue, fallbackValue, unit = '') => {
+      if (apiValue && apiValue !== 'Unknown' && apiValue !== 'N/A') {
+        return `${formatNumber(apiValue)}${unit}`;
+      }
+      if (fallbackValue && fallbackValue !== 'Unknown') {
+        return `${formatNumber(fallbackValue)}${unit}`;
+      }
+      return 'Unknown';
+    };
+
+    // Update with fetched data (with fallback to solarSystemData values)
+    // Special handling for the Sun (distance from Earth is ~149.6 million km)
+    let distanceValue;
+    if (key === 'sun') {
+      distanceValue = getFallbackValue(
+        objectData.distanceFromEarth_km, 
+        '149600000', // Sun is ~149.6 million km from Earth
+        ' km'
+      );
+    } else {
+      distanceValue = getFallbackValue(
+        objectData.distanceFromEarth_km, 
+        data.distance ? (data.distance * 149597870.7).toFixed(0) : null, 
+        ' km'
+      );
+    }
+    distanceEl.textContent = distanceValue;
+    radiusEl.textContent = getFallbackValue(
+      objectData.radius_km, 
+      data.radius, 
+      ' km'
+    );
+    rotationEl.textContent = getFallbackValue(
+      objectData.rotation_period_hours, 
+      data.rotationSpeed ? (24 / data.rotationSpeed).toFixed(1) : null, 
+      ' hours'
+    );
+    orbitalPeriodEl.textContent = getFallbackValue(
+      objectData.orbital_period_days, 
+      data.orbitSpeed ? (365 / data.orbitSpeed).toFixed(0) : null, 
+      ' days'
+    );
+    orbitalSpeedEl.textContent = getFallbackValue(
+      objectData.orbital_speed_kms, 
+      data.orbitSpeed ? (data.orbitSpeed * 30).toFixed(1) : null, 
+      ' km/s'
+    );
     
     // Interesting facts
     factsList.innerHTML = '';
