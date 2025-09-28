@@ -206,15 +206,21 @@ exports.handler = async (event, context) => {
     }
 
     const objectKey = objectName.toLowerCase();
+    console.log(`🔍 Looking for object: "${objectName}" -> key: "${objectKey}"`);
+    console.log(`📋 Available keys:`, Object.keys(fallbackData));
     
     // Check if we have fallback data for this object
     if (fallbackData[objectKey]) {
+      console.log(`✅ Found data for ${objectKey}`);
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify(fallbackData[objectKey])
       };
     }
+
+    console.log(`❌ No data found for ${objectKey}`);
+    
 
     // If no fallback data, return basic info
     return {
