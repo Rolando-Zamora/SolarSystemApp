@@ -84,10 +84,27 @@ body::before {
 .site-title {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--brand), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.site-text {
+  display: inline;
+}
+
+.brand-letter {
+  color: var(--brand);
+}
+
+.accent-letter {
+  color: var(--accent);
+}
+
+.site-logo {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
 }
 
 .site-subtitle {

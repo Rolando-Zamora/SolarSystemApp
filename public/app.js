@@ -1210,7 +1210,7 @@ class SolarSystem {
     const infoContent = document.getElementById('infoContent');
     infoContent.innerHTML = `
       <div class="welcome-message">
-        <h3>Welcome to SolarScope</h3>
+        <h3>Welcome to SpaceHopper</h3>
         <p>Click on any celestial object to explore detailed information about it.</p>
         <div class="feature-list">
           <div class="feature-item">
@@ -1628,7 +1628,7 @@ class SolarSystem {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🌌 Starting SolarScope initialization...');
+  console.log('🌌 Starting SpaceHopper initialization...');
   
   // Check if Three.js is loaded
   if (typeof THREE === 'undefined') {
@@ -1724,7 +1724,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.pauseAnimation = () => solarSystem.pauseAnimation();
     window.resumeAnimation = () => solarSystem.resumeAnimation();
     
-    console.log('🚀 SolarScope initialized successfully!');
+    console.log('🚀 SpaceHopper initialized successfully!');
     console.log('📊 Performance stats:', solarSystem.getPerformanceStats());
     
     // Force a resize after initialization to ensure proper canvas dimensions
@@ -1745,6 +1745,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
     
   } catch (error) {
-    console.error('❌ Error initializing SolarScope:', error);
+    console.error('❌ Error initializing SpaceHopper:', error);
   }
 });

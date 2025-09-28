@@ -678,7 +678,7 @@ If asked about topics outside of astronomy/space science, politely redirect to s
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 SolarScope server running at http://localhost:${PORT}`);
+  console.log(`🚀 SpaceHopper server running at http://localhost:${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   
   if (!process.env.OPENAI_API_KEY) {

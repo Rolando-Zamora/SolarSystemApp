@@ -1,5 +1,5 @@
 {
-  "name": "solarscope",
+  "name": "spacehopper",
   "version": "1.0.0",
   "description": "Interactive 3D Solar System Explorer with AI-powered content",
   "main": "server.js",
@@ -8,7 +8,7 @@
     "start": "NODE_ENV=production node server.js"
   },
   "keywords": ["solar-system", "three.js", "astronomy", "education", "interactive"],
-  "author": "SolarScope Team",
+  "author": "SpaceHopper Team",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
