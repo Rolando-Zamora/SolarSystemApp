@@ -68,7 +68,10 @@ exports.handler = async (event, context) => {
     - Suitable for general audiences
     - Each fact should be 1-2 sentences long
     
-    Focus on recent discoveries, unique characteristics, or interesting comparisons. Return only the facts as a JSON array of strings.`;
+    Focus on recent discoveries, unique characteristics, or interesting comparisons. 
+    
+    IMPORTANT: Respond with ONLY a valid JSON array of 4 strings. No markdown, no code blocks, no extra text. Just the raw JSON array like this format:
+    ["Fact 1 text here", "Fact 2 text here", "Fact 3 text here", "Fact 4 text here"]`;
 
     const openaiResponse = await request('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -103,18 +106,41 @@ exports.handler = async (event, context) => {
     const content = openaiData.choices[0].message.content.trim();
     console.log('Raw OpenAI response:', content);
 
-    // Parse the JSON response
+    // Parse the JSON response with better error handling
     let facts;
     try {
-      facts = JSON.parse(content);
+      // Remove code block markers if present
+      let cleanContent = content;
+      if (content.includes('```')) {
+        cleanContent = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+      }
+      
+      // Try to find JSON array in the response
+      const jsonMatch = cleanContent.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        cleanContent = jsonMatch[0];
+      }
+      
+      facts = JSON.parse(cleanContent);
       if (!Array.isArray(facts)) {
         throw new Error('Response is not an array');
       }
     } catch (parseError) {
       console.error('Failed to parse OpenAI response as JSON:', parseError);
+      console.error('Content that failed to parse:', content);
+      
       // Try to extract facts from text if JSON parsing fails
-      const lines = content.split('\n').filter(line => line.trim().length > 0);
-      facts = lines.slice(0, 4).map(line => line.replace(/^\d+\.?\s*/, '').replace(/^[-*]\s*/, '').trim());
+      let lines = content.split('\n').filter(line => line.trim().length > 0);
+      
+      // Remove code block markers
+      lines = lines.filter(line => !line.includes('```'));
+      
+      // Extract facts from numbered or bulleted lists
+      facts = lines
+        .slice(0, 6) // Take more lines in case some are headers
+        .map(line => line.replace(/^\d+\.?\s*/, '').replace(/^[-*]\s*/, '').replace(/^"/, '').replace(/"$/, '').trim())
+        .filter(line => line.length > 10) // Filter out short/empty lines
+        .slice(0, 4); // Take only 4 facts
     }
 
     // Ensure we have at least some facts

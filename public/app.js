@@ -1324,12 +1324,20 @@ class SolarSystem {
       }
     }
     
-    // Update with fetched data
-    distanceEl.textContent = `${objectData.distanceFromEarth_km} km`;
-    radiusEl.textContent = `${objectData.radius_km} km`;
-    rotationEl.textContent = `${objectData.rotation_period_hours} hours`;
-    orbitalPeriodEl.textContent = `${objectData.orbital_period_days} days`;
-    orbitalSpeedEl.textContent = `${objectData.orbital_speed_kms} km/s`;
+    // Helper function to format numbers with commas
+    const formatNumber = (value) => {
+      if (value === 'Unknown' || value === 'N/A' || !value) return value;
+      const num = parseFloat(value);
+      if (isNaN(num)) return value;
+      return num.toLocaleString();
+    };
+
+    // Update with fetched data (with comma formatting)
+    distanceEl.textContent = `${formatNumber(objectData.distanceFromEarth_km)} km`;
+    radiusEl.textContent = `${formatNumber(objectData.radius_km)} km`;
+    rotationEl.textContent = `${formatNumber(objectData.rotation_period_hours)} hours`;
+    orbitalPeriodEl.textContent = `${formatNumber(objectData.orbital_period_days)} days`;
+    orbitalSpeedEl.textContent = `${formatNumber(objectData.orbital_speed_kms)} km/s`;
     
     // Interesting facts
     factsList.innerHTML = '';
