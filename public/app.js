@@ -1392,14 +1392,15 @@ class SolarSystem {
 
   async getMoreInfo(objectName, btnElement = null) {
     const btn = btnElement || document.querySelector('#moreInfo');
+    const factsList = document.querySelector('.facts-list');
     
-    if (!btn) return;
+    if (!btn || !factsList) return;
     
     btn.disabled = true;
-    btn.innerHTML = '<span class="btn-icon">⏳</span> Loading...';
+    btn.innerHTML = '<span class="btn-icon">⏳</span> Generating Facts...';
     
     try {
-      const response = await fetch('/api/text', {
+      const response = await fetch('/api/generate-facts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ objectName })
@@ -1407,16 +1408,43 @@ class SolarSystem {
       
       const data = await response.json();
       
-      // Clear cache and update the display with new information
-      const cacheKey = `object_${this.selectedObject}`;
-      sessionStorage.removeItem(cacheKey);
-      this.showObjectDetails(this.selectedObject, solarSystemData[this.selectedObject]);
+      if (data.success && data.facts) {
+        // Clear existing facts and add new ones with animation
+        factsList.innerHTML = '';
+        
+        data.facts.forEach((fact, index) => {
+          setTimeout(() => {
+            const li = document.createElement('li');
+            li.textContent = fact;
+            li.style.opacity = '0';
+            li.style.transform = 'translateY(10px)';
+            factsList.appendChild(li);
+            
+            // Animate in
+            setTimeout(() => {
+              li.style.transition = 'all 0.3s ease';
+              li.style.opacity = '1';
+              li.style.transform = 'translateY(0)';
+            }, 50);
+          }, index * 100); // Stagger the animations
+        });
+        
+        // Show success feedback
+        btn.innerHTML = '<span class="btn-icon">✨</span> New Facts!';
+        setTimeout(() => {
+          btn.innerHTML = '<span class="btn-icon">🔄</span> New Facts';
+        }, 2000);
+      } else {
+        throw new Error(data.message || 'Failed to generate facts');
+      }
     } catch (error) {
-      console.error('Error fetching more info:', error);
-      alert('Failed to fetch additional information. Please try again.');
+      console.error('Error generating new facts:', error);
+      btn.innerHTML = '<span class="btn-icon">❌</span> Try Again';
+      setTimeout(() => {
+        btn.innerHTML = '<span class="btn-icon">🔄</span> New Facts';
+      }, 3000);
     } finally {
       btn.disabled = false;
-      btn.innerHTML = '<span class="btn-icon">📖</span> More Info';
     }
   }
 
