@@ -76,6 +76,96 @@ const fallbackData = {
       "A day on Mars is very similar to Earth - 24 hours and 37 minutes"
     ],
     sources: ["NASA Mars Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  jupiter: {
+    name: "Jupiter",
+    type: "Gas Giant",
+    distanceFromEarth_km: "628700000",
+    radius_km: "69911",
+    rotation_period_hours: "9.9",
+    orbital_period_days: "4333",
+    orbital_speed_kms: "13.07",
+    interesting_facts: [
+      "Jupiter is the largest planet in our solar system",
+      "Jupiter has 95 known moons, including the four large Galilean moons",
+      "Jupiter's Great Red Spot is a storm larger than Earth that has raged for centuries"
+    ],
+    sources: ["NASA Jupiter Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  saturn: {
+    name: "Saturn",
+    type: "Gas Giant",
+    distanceFromEarth_km: "1275000000",
+    radius_km: "58232",
+    rotation_period_hours: "10.7",
+    orbital_period_days: "10759",
+    orbital_speed_kms: "9.69",
+    interesting_facts: [
+      "Saturn is famous for its prominent ring system",
+      "Saturn has 146 known moons, including Titan which has a thick atmosphere",
+      "Saturn is less dense than water - it would float if there was an ocean big enough"
+    ],
+    sources: ["NASA Saturn Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  uranus: {
+    name: "Uranus",
+    type: "Ice Giant",
+    distanceFromEarth_km: "2723950000",
+    radius_km: "25362",
+    rotation_period_hours: "17.2",
+    orbital_period_days: "30687",
+    orbital_speed_kms: "6.81",
+    interesting_facts: [
+      "Uranus rotates on its side with an axial tilt of 98 degrees",
+      "Uranus has 27 known moons and a faint ring system",
+      "Uranus appears blue-green due to methane in its atmosphere"
+    ],
+    sources: ["NASA Uranus Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  neptune: {
+    name: "Neptune",
+    type: "Ice Giant",
+    distanceFromEarth_km: "4351400000",
+    radius_km: "24622",
+    rotation_period_hours: "16.1",
+    orbital_period_days: "60190",
+    orbital_speed_kms: "5.43",
+    interesting_facts: [
+      "Neptune has the strongest winds in the solar system, reaching 2,100 km/h",
+      "Neptune has 16 known moons, with Triton being the largest",
+      "Neptune takes 165 Earth years to complete one orbit around the Sun"
+    ],
+    sources: ["NASA Neptune Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  pluto: {
+    name: "Pluto",
+    type: "Dwarf Planet",
+    distanceFromEarth_km: "5906380000",
+    radius_km: "1188.3",
+    rotation_period_hours: "153.3",
+    orbital_period_days: "90560",
+    orbital_speed_kms: "4.67",
+    interesting_facts: [
+      "Pluto was reclassified as a dwarf planet in 2006",
+      "Pluto has 5 known moons, with Charon being the largest",
+      "Pluto's surface is covered in nitrogen, methane, and carbon monoxide ices"
+    ],
+    sources: ["NASA Pluto Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  moon: {
+    name: "Moon",
+    type: "Natural Satellite",
+    distanceFromEarth_km: "384400",
+    radius_km: "1737.4",
+    rotation_period_hours: "655.7",
+    orbital_period_days: "27.3",
+    orbital_speed_kms: "1.02",
+    interesting_facts: [
+      "The Moon is Earth's only natural satellite",
+      "The Moon causes Earth's tides through gravitational pull",
+      "The Moon is gradually moving away from Earth at about 3.8 cm per year"
+    ],
+    sources: ["NASA Moon Fact Sheet", "JPL Solar System Dynamics"]
   }
 };
 
