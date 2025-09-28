@@ -166,6 +166,66 @@ const fallbackData = {
       "The Moon is gradually moving away from Earth at about 3.8 cm per year"
     ],
     sources: ["NASA Moon Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  ceres: {
+    name: "Ceres",
+    type: "Dwarf Planet",
+    distanceFromEarth_km: "414000000",
+    radius_km: "473",
+    rotation_period_hours: "9.1",
+    orbital_period_days: "1682",
+    orbital_speed_kms: "17.9",
+    interesting_facts: [
+      "Ceres is the largest object in the asteroid belt between Mars and Jupiter",
+      "Ceres contains about one-third of the asteroid belt's total mass",
+      "Ceres has bright spots that may be salt deposits from subsurface water"
+    ],
+    sources: ["NASA Ceres Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  haumea: {
+    name: "Haumea",
+    type: "Dwarf Planet",
+    distanceFromEarth_km: "6484000000",
+    radius_km: "816",
+    rotation_period_hours: "3.9",
+    orbital_period_days: "103774",
+    orbital_speed_kms: "4.5",
+    interesting_facts: [
+      "Haumea is one of the fastest rotating large objects in our solar system",
+      "Haumea has an elongated shape due to its rapid rotation",
+      "Haumea has two known moons: Hi'iaka and Namaka"
+    ],
+    sources: ["NASA Haumea Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  makemake: {
+    name: "Makemake",
+    type: "Dwarf Planet",
+    distanceFromEarth_km: "6850000000",
+    radius_km: "715",
+    rotation_period_hours: "22.5",
+    orbital_period_days: "112897",
+    orbital_speed_kms: "4.4",
+    interesting_facts: [
+      "Makemake is one of the largest known objects in the Kuiper Belt",
+      "Makemake has a reddish surface likely due to organic compounds",
+      "Makemake has one known moon discovered in 2016"
+    ],
+    sources: ["NASA Makemake Fact Sheet", "JPL Solar System Dynamics"]
+  },
+  eris: {
+    name: "Eris",
+    type: "Dwarf Planet",
+    distanceFromEarth_km: "10210000000",
+    radius_km: "1163",
+    rotation_period_hours: "25.9",
+    orbital_period_days: "203830",
+    orbital_speed_kms: "3.4",
+    interesting_facts: [
+      "Eris is one of the most distant known dwarf planets",
+      "Eris has one moon called Dysnomia",
+      "Eris's discovery led to Pluto's reclassification as a dwarf planet"
+    ],
+    sources: ["NASA Eris Fact Sheet", "JPL Solar System Dynamics"]
   }
 };
 
