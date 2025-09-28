@@ -1,3 +1,5 @@
+const { request } = require('undici');
+
 exports.handler = async (event, context) => {
   // Handle CORS
   const headers = {
@@ -26,6 +28,9 @@ exports.handler = async (event, context) => {
   try {
     const { question, context } = JSON.parse(event.body);
     
+    console.log(`🤖 AI Question received: "${question}"`);
+    console.log(`📝 Context provided:`, context);
+    
     if (!question) {
       return {
         statusCode: 400,
@@ -34,7 +39,63 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Provide basic astronomical responses based on common questions
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    
+    // If OpenAI API key is available, use AI for intelligent responses
+    if (openaiApiKey) {
+      console.log(`🧠 Using OpenAI for intelligent response`);
+      
+      const systemPrompt = `You are an expert astronomer and space educator. Answer questions about the solar system, planets, moons, and space in an engaging, educational way. Keep responses concise (2-3 sentences) but informative. Use scientific facts and make it interesting for learners.`;
+      
+      const userPrompt = context ? 
+        `Question about ${context}: ${question}` : 
+        `Question about the solar system: ${question}`;
+
+      try {
+        const openaiResponse = await request('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openaiApiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt }
+            ],
+            max_tokens: 150,
+            temperature: 0.7
+          })
+        });
+
+        const openaiData = await openaiResponse.body.json();
+
+        if (openaiResponse.statusCode === 200) {
+          const aiResponse = openaiData.choices[0].message.content.trim();
+          console.log(`✅ AI response generated successfully`);
+          
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+              response: aiResponse,
+              sources: ["OpenAI GPT-3.5", "Astronomical Knowledge Base"]
+            })
+          };
+        } else {
+          console.error('OpenAI API Error:', openaiData);
+          // Fall back to keyword-based responses
+        }
+      } catch (aiError) {
+        console.error('AI Error:', aiError);
+        // Fall back to keyword-based responses
+      }
+    }
+
+    // Fallback: Provide basic astronomical responses based on common questions
+    console.log(`📚 Using fallback keyword-based responses`);
+    
     const responses = {
       'how far': `The distances in our solar system are vast. For example, Earth is about 150 million km from the Sun, while Neptune is about 4.5 billion km away.`,
       'how big': `Celestial objects vary greatly in size. The Sun has a radius of about 696,340 km, while Earth's radius is about 6,371 km.`,
@@ -75,7 +136,10 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Internal server error' })
+      body: JSON.stringify({ 
+        error: 'Internal server error',
+        message: 'Sorry, I encountered an error while processing your question. Please try again.'
+      })
     };
   }
 };
