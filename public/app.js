@@ -1798,3 +1798,147 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('❌ Error initializing SpaceHopper:', error);
   }
 });
+
+// Modal Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // About Modal
+  const aboutLink = document.querySelector('a[href="#about"]');
+  const aboutModal = document.getElementById('aboutModal');
+  const modalClose = document.getElementById('modalClose');
+
+  // Objects Modal
+  const objectsLink = document.querySelector('a[href="#objects"]');
+  const objectsModal = document.getElementById('objectsModal');
+  const objectsModalClose = document.getElementById('objectsModalClose');
+
+  // Open About modal
+  if (aboutLink) {
+    aboutLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      aboutModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    });
+  }
+
+  // Open Objects modal
+  if (objectsLink) {
+    objectsLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      populateObjectsModal();
+      objectsModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    });
+  }
+
+  // Close About modal
+  if (modalClose) {
+    modalClose.addEventListener('click', function() {
+      aboutModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    });
+  }
+
+  // Close Objects modal
+  if (objectsModalClose) {
+    objectsModalClose.addEventListener('click', function() {
+      objectsModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    });
+  }
+
+  // Close modals when clicking outside
+  if (aboutModal) {
+    aboutModal.addEventListener('click', function(e) {
+      if (e.target === aboutModal) {
+        aboutModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    });
+  }
+
+  if (objectsModal) {
+    objectsModal.addEventListener('click', function(e) {
+      if (e.target === objectsModal) {
+        objectsModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    });
+  }
+
+  // Close modals with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (aboutModal.style.display === 'flex') {
+        aboutModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+      if (objectsModal.style.display === 'flex') {
+        objectsModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
+  });
+
+  // Populate Objects Modal with data
+  function populateObjectsModal() {
+    const objectsGrid = document.getElementById('objectsGrid');
+    objectsGrid.innerHTML = '';
+
+    // Filter to only show the 14 main objects
+    const displayObjects = ['sun', 'mercury', 'venus', 'earth', 'mars', 'ceres', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'eris', 'haumea', 'makemake'];
+    
+    displayObjects.forEach(key => {
+      const data = solarSystemData[key];
+      if (!data) return;
+
+      const objectCard = document.createElement('div');
+      objectCard.className = 'object-card';
+      objectCard.setAttribute('data-object', key);
+      
+      // Format distance (convert AU to million km for display)
+      const distanceDisplay = key === 'sun' ? '149.6' : data.distance ? (data.distance * 149.6).toFixed(1) : 'Unknown';
+      
+      // Format radius (convert to thousands of km for readability)
+      const radiusDisplay = data.radius ? (data.radius > 10000 ? `${(data.radius / 1000).toFixed(0)}k` : data.radius.toLocaleString()) : 'Unknown';
+      
+      objectCard.innerHTML = `
+        <div class="object-card-header">
+          <div class="object-color-indicator" style="background-color: #${data.color.toString(16).padStart(6, '0')};"></div>
+          <h3 class="object-name">${data.name}</h3>
+          <span class="object-type">${data.type}</span>
+        </div>
+        <div class="object-stats">
+          <div class="stat-row">
+            <span class="stat-label">Distance:</span>
+            <span class="stat-value">${distanceDisplay}M km</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Radius:</span>
+            <span class="stat-value">${radiusDisplay} km</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Rotation:</span>
+            <span class="stat-value">${data.rotationSpeed ? `${data.rotationSpeed.toFixed(3)}` : 'Unknown'}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Orbit Speed:</span>
+            <span class="stat-value">${data.orbitSpeed ? `${data.orbitSpeed.toFixed(3)}` : 'N/A'}</span>
+          </div>
+        </div>
+      `;
+
+      // Add click handler to select object and close modal
+      objectCard.addEventListener('click', function() {
+        objectsModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        
+        // If SolarSystem instance exists, select the object
+        if (window.solarSystem && typeof window.solarSystem.selectObject === 'function') {
+          window.solarSystem.selectObject(key);
+        }
+      });
+
+      objectsGrid.appendChild(objectCard);
+    });
+  }
+});

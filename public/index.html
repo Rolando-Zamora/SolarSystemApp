@@ -178,7 +178,7 @@
                     <div class="action-buttons">
                         <button class="btn btn-primary" id="generateImage">
                             <span class="btn-icon">🖼️</span>
-                            Generate Image
+                            Generate
                         </button>
                         <button class="btn btn-secondary" id="moreInfo">
                             <span class="btn-icon">🔄</span>
@@ -194,6 +194,53 @@
             </div>
         </div>
     </template>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>About SpaceHopper</h2>
+                <span class="modal-close" id="modalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>SpaceHopper is an app developed through ai-assisted coding on Windsurf as the IDE, its uses GitHub as the repository and version control, and is deployed with Netlify. Users are able to navigate a linear model of the solar system, select an object of interest and review interesting facts. API calls are made to generate additional interesting details using gpt-4o-mini, and an image of the selected planet is generated via dall-e-3.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Objects Statistics Modal -->
+    <div id="objectsModal" class="modal" style="display: none;">
+        <div class="modal-content objects-modal-content">
+            <div class="modal-header">
+                <h2>Solar System Objects Dashboard</h2>
+                <span class="modal-close" id="objectsModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="stats-summary">
+                    <div class="summary-item">
+                        <span class="summary-number">14</span>
+                        <span class="summary-label">Total Objects</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">8</span>
+                        <span class="summary-label">Planets</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">5</span>
+                        <span class="summary-label">Dwarf Planets</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-number">1</span>
+                        <span class="summary-label">Star</span>
+                    </div>
+                </div>
+                
+                <div class="objects-grid" id="objectsGrid">
+                    <!-- Objects will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="enhanced-planets.js"></script>
     <script src="app.js"></script>

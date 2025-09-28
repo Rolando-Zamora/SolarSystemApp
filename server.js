@@ -362,7 +362,7 @@ async function callOpenAI(input, systemPrompt = null) {
             content: prompt
           }
         ],
-        max_tokens: systemPrompt ? 500 : 1000, // Shorter responses for questions
+        max_tokens: systemPrompt ? 500 : 750, // Reduced tokens for more concise facts
         temperature: 0.7,
       }),
     });
