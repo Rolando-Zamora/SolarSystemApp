@@ -276,7 +276,16 @@ class SolarSystem {
     const width = rect.width || 800;
     const height = rect.height || 600;
     const aspect = width / height;
-    const frustumSize = 800; // Reduced from 1200 to 800 for more zoom
+    
+    // Adjust frustum size for mobile/tablet devices
+    const isMobile = width < 768;
+    const isTablet = width >= 768 && width < 1024;
+    let frustumSize = 800; // Default desktop
+    if (isMobile) {
+      frustumSize = 600; // Zoom in more on mobile
+    } else if (isTablet) {
+      frustumSize = 700; // Medium zoom for tablets
+    }
     
     this.camera = new THREE.OrthographicCamera(
       (frustumSize * aspect) / -2,
@@ -323,6 +332,12 @@ class SolarSystem {
       LEFT: THREE.MOUSE.PAN,
       MIDDLE: THREE.MOUSE.DOLLY,
       RIGHT: null
+    };
+    
+    // Enable touch controls
+    this.controls.touches = {
+      ONE: THREE.TOUCH.PAN,
+      TWO: THREE.TOUCH.DOLLY_PAN
     };
     
     // Set initial target to center of timeline
@@ -994,6 +1009,55 @@ class SolarSystem {
       }
       mouseMoved = false;
     });
+    
+    // Touch events for mobile/tablet
+    let touchStartTime = 0;
+    let touchMoved = false;
+    let touchStartPos = { x: 0, y: 0 };
+    
+    this.renderer.domElement.addEventListener('touchstart', (event) => {
+      if (event.touches.length === 1) {
+        touchStartTime = Date.now();
+        touchMoved = false;
+        const touch = event.touches[0];
+        touchStartPos = { x: touch.clientX, y: touch.clientY };
+      }
+    }, { passive: true });
+    
+    this.renderer.domElement.addEventListener('touchmove', (event) => {
+      if (event.touches.length === 1) {
+        const touch = event.touches[0];
+        const distance = Math.sqrt(
+          Math.pow(touch.clientX - touchStartPos.x, 2) +
+          Math.pow(touch.clientY - touchStartPos.y, 2)
+        );
+        // If moved more than 10 pixels, consider it a drag
+        if (distance > 10) {
+          touchMoved = true;
+        }
+      }
+    }, { passive: true });
+    
+    this.renderer.domElement.addEventListener('touchend', (event) => {
+      const touchDuration = Date.now() - touchStartTime;
+      
+      // Only treat as tap if:
+      // 1. Single touch
+      // 2. Touch duration < 300ms
+      // 3. Minimal movement (touchMoved = false)
+      if (event.changedTouches.length === 1 && touchDuration < 300 && !touchMoved) {
+        const touch = event.changedTouches[0];
+        // Create a synthetic mouse event for touch
+        const syntheticEvent = {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+          target: event.target
+        };
+        this.onMouseClick(syntheticEvent);
+      }
+      
+      touchMoved = false;
+    }, { passive: true });
 
     // Keyboard events
     document.addEventListener('keydown', (event) => {
@@ -1113,7 +1177,16 @@ class SolarSystem {
       
       // Update orthographic camera
       const aspect = width / height;
-      const frustumSize = 800; // Match the initial camera setup
+      
+      // Adjust frustum size for mobile/tablet devices
+      const isMobile = width < 768;
+      const isTablet = width >= 768 && width < 1024;
+      let frustumSize = 800; // Default desktop
+      if (isMobile) {
+        frustumSize = 600; // Zoom in more on mobile
+      } else if (isTablet) {
+        frustumSize = 700; // Medium zoom for tablets
+      }
       
       this.camera.left = (frustumSize * aspect) / -2;
       this.camera.right = (frustumSize * aspect) / 2;
@@ -1918,11 +1991,11 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="stat-row">
             <span class="stat-label">Rotation:</span>
-            <span class="stat-value">${data.rotationSpeed ? `${data.rotationSpeed.toFixed(3)}` : 'Unknown'}</span>
+            <span class="stat-value">${data.rotationSpeed ? `${(24 / data.rotationSpeed).toFixed(1)} hrs` : 'Unknown'}</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Orbit Speed:</span>
-            <span class="stat-value">${data.orbitSpeed ? `${data.orbitSpeed.toFixed(3)}` : 'N/A'}</span>
+            <span class="stat-value">${data.orbitSpeed ? `${(data.orbitSpeed * 30).toFixed(1)} km/s` : 'N/A'}</span>
           </div>
         </div>
       `;
