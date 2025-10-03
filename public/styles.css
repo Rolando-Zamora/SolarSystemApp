@@ -991,6 +991,24 @@ body::before {
   }
 }
 
+@media (max-width: 768px) {
+  /* Stack object info columns vertically on mobile */
+  .object-detail-three-columns {
+    flex-direction: column;
+    overflow-y: auto;
+    height: auto;
+  }
+  
+  .object-column-1,
+  .object-column-2,
+  .object-column-3 {
+    flex: none;
+    width: 100%;
+    padding-right: 0;
+    overflow: visible;
+  }
+}
+
 @media (max-width: 600px) {
   .header {
     padding: 1rem;

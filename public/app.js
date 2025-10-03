@@ -8,6 +8,8 @@ const solarSystemData = {
     distance: 0,
     rotationSpeed: 0.004,
     orbitSpeed: 0,
+    rotationPeriod: 609.12, // hours (25.4 days at equator)
+    orbitalSpeed: 0, // km/s (N/A)
     texture: null
   },
   mercury: {
@@ -18,6 +20,8 @@ const solarSystemData = {
     distance: 57.9,
     rotationSpeed: 0.002,
     orbitSpeed: 0.02,
+    rotationPeriod: 1407.6, // hours (58.6 days)
+    orbitalSpeed: 47.4, // km/s
     texture: null
   },
   venus: {
@@ -28,6 +32,8 @@ const solarSystemData = {
     distance: 108.2,
     rotationSpeed: -0.001,
     orbitSpeed: 0.015,
+    rotationPeriod: -5832.5, // hours (243 days, retrograde)
+    orbitalSpeed: 35.0, // km/s
     texture: null
   },
   earth: {
@@ -38,6 +44,8 @@ const solarSystemData = {
     distance: 149.6,
     rotationSpeed: 0.01,
     orbitSpeed: 0.01,
+    rotationPeriod: 24, // hours
+    orbitalSpeed: 29.8, // km/s
     texture: null
   },
   mars: {
@@ -48,6 +56,8 @@ const solarSystemData = {
     distance: 227.9,
     rotationSpeed: 0.009,
     orbitSpeed: 0.008,
+    rotationPeriod: 24.6, // hours
+    orbitalSpeed: 24.1, // km/s
     texture: null
   },
   jupiter: {
@@ -58,6 +68,8 @@ const solarSystemData = {
     distance: 778.5,
     rotationSpeed: 0.02,
     orbitSpeed: 0.005,
+    rotationPeriod: 9.9, // hours
+    orbitalSpeed: 13.1, // km/s
     texture: null
   },
   saturn: {
@@ -68,6 +80,8 @@ const solarSystemData = {
     distance: 1432,
     rotationSpeed: 0.018,
     orbitSpeed: 0.003,
+    rotationPeriod: 10.7, // hours
+    orbitalSpeed: 9.7, // km/s
     texture: null,
     hasRings: true
   },
@@ -79,6 +93,8 @@ const solarSystemData = {
     distance: 2867,
     rotationSpeed: 0.012,
     orbitSpeed: 0.002,
+    rotationPeriod: -17.2, // hours (retrograde)
+    orbitalSpeed: 6.8, // km/s
     texture: null
   },
   neptune: {
@@ -89,6 +105,8 @@ const solarSystemData = {
     distance: 4515,
     rotationSpeed: 0.011,
     orbitSpeed: 0.001,
+    rotationPeriod: 16.1, // hours
+    orbitalSpeed: 5.4, // km/s
     texture: null
   },
   pluto: {
@@ -99,6 +117,8 @@ const solarSystemData = {
     distance: 5906.4,
     rotationSpeed: 0.001,
     orbitSpeed: 0.0008,
+    rotationPeriod: 153.3, // hours (6.4 days)
+    orbitalSpeed: 4.7, // km/s
     texture: null
   },
   ceres: {
@@ -109,6 +129,8 @@ const solarSystemData = {
     distance: 413.7,
     rotationSpeed: 0.003,
     orbitSpeed: 0.006,
+    rotationPeriod: 9.1, // hours
+    orbitalSpeed: 17.9, // km/s
     texture: null
   },
   eris: {
@@ -119,6 +141,8 @@ const solarSystemData = {
     distance: 10120,
     rotationSpeed: 0.001,
     orbitSpeed: 0.0005,
+    rotationPeriod: 25.9, // hours
+    orbitalSpeed: 3.4, // km/s
     texture: null
   },
   haumea: {
@@ -129,6 +153,8 @@ const solarSystemData = {
     distance: 6484,
     rotationSpeed: 0.003,
     orbitSpeed: 0.0007,
+    rotationPeriod: 3.9, // hours (fastest rotating large object!)
+    orbitalSpeed: 4.5, // km/s
     texture: null
   },
   makemake: {
@@ -139,6 +165,8 @@ const solarSystemData = {
     distance: 6850,
     rotationSpeed: 0.002,
     orbitSpeed: 0.0006,
+    rotationPeriod: 22.5, // hours
+    orbitalSpeed: 4.4, // km/s
     texture: null
   },
   moon: {
@@ -295,9 +323,12 @@ class SolarSystem {
       1,
       10000
     );
-    this.camera.position.set(1650, 0, 5000); // Center on timeline (0 to 3300, center = 1650)
-    this.camera.lookAt(1650, 0, 0);
-    console.log('📷 Camera created');
+    
+    // Adjust camera Y position for mobile to center the model better
+    const cameraY = isMobile ? 100 : 0; // Raise camera on mobile to show planets higher on canvas
+    this.camera.position.set(1650, cameraY, 5000); // Center on timeline (0 to 3300, center = 1650)
+    this.camera.lookAt(1650, cameraY, 0);
+    console.log('📷 Camera created', isMobile ? '(mobile positioning)' : '');
 
     // Renderer - Optimized for performance
     this.renderer = new THREE.WebGLRenderer({ 
@@ -340,13 +371,17 @@ class SolarSystem {
       TWO: THREE.TOUCH.DOLLY_PAN
     };
     
-    // Set initial target to center of timeline
-    this.controls.target.set(1650, 0, 0);
+    // Set initial target to center of timeline (use mobile-adjusted Y position)
+    const targetY = isMobile ? 100 : 0;
+    this.controls.target.set(1650, targetY, 0);
+    
+    // Store the target Y for restrictions
+    this.targetY = targetY;
     
     // Restrict panning to horizontal only
     this.controls.addEventListener('change', () => {
-      // Keep Y position fixed for timeline view
-      this.controls.target.y = 0;
+      // Keep Y position fixed for timeline view (use device-specific Y)
+      this.controls.target.y = this.targetY;
       // Limit horizontal panning range for simplified timeline (expanded range)
       this.controls.target.x = Math.max(-200, Math.min(3500, this.controls.target.x));
     });
@@ -1193,6 +1228,15 @@ class SolarSystem {
       this.camera.top = frustumSize / 2;
       this.camera.bottom = frustumSize / -2;
       
+      // Update camera Y position for mobile devices
+      const newTargetY = isMobile ? 100 : 0;
+      if (this.targetY !== newTargetY) {
+        this.targetY = newTargetY;
+        this.camera.position.y = newTargetY;
+        this.controls.target.y = newTargetY;
+        this.camera.lookAt(this.controls.target.x, newTargetY, 0);
+      }
+      
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(width, height, false); // Don't update CSS
       
@@ -1235,8 +1279,8 @@ class SolarSystem {
       selectionRing.position.z = 0.1; // Slightly in front
       mesh.add(selectionRing);
 
-      // Center camera on object for timeline view (horizontal only)
-      this.controls.target.set(mesh.position.x, 0, 0);
+      // Center camera on object for timeline view (horizontal only, use device-specific Y)
+      this.controls.target.set(mesh.position.x, this.targetY, 0);
       this.controls.update();
       
       // Show object details
@@ -1394,9 +1438,9 @@ class SolarSystem {
               type: data.type,
               distanceFromEarth_km: fallbackDistance,
               radius_km: data.radius || 'Unknown',
-              rotation_period_hours: data.rotationSpeed ? (24 / data.rotationSpeed).toFixed(1) : 'Unknown',
+              rotation_period_hours: data.rotationPeriod ? Math.abs(data.rotationPeriod).toFixed(1) : 'Unknown',
               orbital_period_days: data.orbitSpeed ? (365 / data.orbitSpeed).toFixed(0) : 'Unknown',
-              orbital_speed_kms: data.orbitSpeed ? (data.orbitSpeed * 30).toFixed(1) : 'Unknown', // Approximate conversion
+              orbital_speed_kms: data.orbitalSpeed || 'Unknown',
               interesting_facts: ['Data temporarily unavailable. Click "More Info" to retry.'],
               sources: ['Local database']
             };
@@ -1448,7 +1492,7 @@ class SolarSystem {
     );
     rotationEl.textContent = getFallbackValue(
       objectData.rotation_period_hours, 
-      data.rotationSpeed ? (24 / data.rotationSpeed).toFixed(1) : null, 
+      data.rotationPeriod ? Math.abs(data.rotationPeriod).toFixed(1) : null, 
       ' hours'
     );
     orbitalPeriodEl.textContent = getFallbackValue(
@@ -1458,7 +1502,7 @@ class SolarSystem {
     );
     orbitalSpeedEl.textContent = getFallbackValue(
       objectData.orbital_speed_kms, 
-      data.orbitSpeed ? (data.orbitSpeed * 30).toFixed(1) : null, 
+      data.orbitalSpeed ? data.orbitalSpeed.toFixed(1) : null, 
       ' km/s'
     );
     
@@ -1991,11 +2035,11 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="stat-row">
             <span class="stat-label">Rotation:</span>
-            <span class="stat-value">${data.rotationSpeed ? `${(24 / data.rotationSpeed).toFixed(1)} hrs` : 'Unknown'}</span>
+            <span class="stat-value">${data.rotationPeriod ? `${Math.abs(data.rotationPeriod).toFixed(1)} hrs${data.rotationPeriod < 0 ? ' ↻' : ''}` : 'Unknown'}</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Orbit Speed:</span>
-            <span class="stat-value">${data.orbitSpeed ? `${(data.orbitSpeed * 30).toFixed(1)} km/s` : 'N/A'}</span>
+            <span class="stat-value">${data.orbitalSpeed ? `${data.orbitalSpeed.toFixed(1)} km/s` : 'N/A'}</span>
           </div>
         </div>
       `;
