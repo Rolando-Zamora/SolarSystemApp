@@ -53,7 +53,7 @@ exports.handler = async (event, context) => {
     console.log(`🎨 Generating image for: ${objectName}`);
 
     // Create a detailed prompt for the celestial object
-    const prompt = `A stunning, realistic space photograph of ${objectName} in our solar system. High-resolution, scientifically accurate, beautiful cosmic photography with deep space background, stars, and nebulae. Professional astronomy photography style, vibrant colors, detailed surface features visible.`;
+    const prompt = `A stunning, photorealistic space photograph of ${objectName} in our solar system. High-resolution, scientifically accurate, beautiful cosmic photography with deep space background, as if taken from the James Webb Space Telescope. Professional astronomy photography style, vibrant colors, detailed surface features visible.`;
 
     const dalleResponse = await request('https://api.openai.com/v1/images/generations', {
       method: 'POST',

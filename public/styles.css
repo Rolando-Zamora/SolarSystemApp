@@ -649,6 +649,14 @@ body::before {
   backdrop-filter: blur(4px);
 }
 
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+
 .header-left {
   display: flex;
   align-items: center;

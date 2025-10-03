@@ -269,6 +269,7 @@ class SolarSystem {
       await this.createSolarSystem();
       this.setupEventListeners();
       this.animate();
+      this.showWelcomeMessage(); // Show welcome message by default
       console.log('✅ SolarSystem initialization complete');
     } catch (error) {
       console.error('❌ Error in async SolarSystem initialization:', error);
@@ -310,9 +311,9 @@ class SolarSystem {
     const isTablet = width >= 768 && width < 1024;
     let frustumSize = 800; // Default desktop
     if (isMobile) {
-      frustumSize = 600; // Zoom in more on mobile
+      frustumSize = 400; // Zoom in much more on mobile for better visibility
     } else if (isTablet) {
-      frustumSize = 700; // Medium zoom for tablets
+      frustumSize = 600; // Medium zoom for tablets
     }
     
     this.camera = new THREE.OrthographicCamera(
@@ -324,11 +325,10 @@ class SolarSystem {
       10000
     );
     
-    // Adjust camera Y position for mobile to center the model better
-    const cameraY = isMobile ? 100 : 0; // Raise camera on mobile to show planets higher on canvas
-    this.camera.position.set(1650, cameraY, 5000); // Center on timeline (0 to 3300, center = 1650)
-    this.camera.lookAt(1650, cameraY, 0);
-    console.log('📷 Camera created', isMobile ? '(mobile positioning)' : '');
+    // Keep Y position at 0 for all devices - only adjust zoom via frustumSize
+    this.camera.position.set(1650, 0, 5000); // Center on timeline (0 to 3300, center = 1650)
+    this.camera.lookAt(1650, 0, 0);
+    console.log('📷 Camera created', isMobile ? '(mobile zoom applied)' : '');
 
     // Renderer - Optimized for performance
     this.renderer = new THREE.WebGLRenderer({ 
@@ -371,17 +371,16 @@ class SolarSystem {
       TWO: THREE.TOUCH.DOLLY_PAN
     };
     
-    // Set initial target to center of timeline (use mobile-adjusted Y position)
-    const targetY = isMobile ? 100 : 0;
-    this.controls.target.set(1650, targetY, 0);
+    // Set initial target to center of timeline
+    this.controls.target.set(1650, 0, 0);
     
     // Store the target Y for restrictions
-    this.targetY = targetY;
+    this.targetY = 0;
     
     // Restrict panning to horizontal only
     this.controls.addEventListener('change', () => {
-      // Keep Y position fixed for timeline view (use device-specific Y)
-      this.controls.target.y = this.targetY;
+      // Keep Y position fixed for timeline view
+      this.controls.target.y = 0;
       // Limit horizontal panning range for simplified timeline (expanded range)
       this.controls.target.x = Math.max(-200, Math.min(3500, this.controls.target.x));
     });
@@ -1218,9 +1217,9 @@ class SolarSystem {
       const isTablet = width >= 768 && width < 1024;
       let frustumSize = 800; // Default desktop
       if (isMobile) {
-        frustumSize = 600; // Zoom in more on mobile
+        frustumSize = 400; // Zoom in much more on mobile for better visibility
       } else if (isTablet) {
-        frustumSize = 700; // Medium zoom for tablets
+        frustumSize = 600; // Medium zoom for tablets
       }
       
       this.camera.left = (frustumSize * aspect) / -2;
@@ -1228,14 +1227,8 @@ class SolarSystem {
       this.camera.top = frustumSize / 2;
       this.camera.bottom = frustumSize / -2;
       
-      // Update camera Y position for mobile devices
-      const newTargetY = isMobile ? 100 : 0;
-      if (this.targetY !== newTargetY) {
-        this.targetY = newTargetY;
-        this.camera.position.y = newTargetY;
-        this.controls.target.y = newTargetY;
-        this.camera.lookAt(this.controls.target.x, newTargetY, 0);
-      }
+      // Keep Y position consistent
+      this.targetY = 0;
       
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(width, height, false); // Don't update CSS
@@ -1279,8 +1272,8 @@ class SolarSystem {
       selectionRing.position.z = 0.1; // Slightly in front
       mesh.add(selectionRing);
 
-      // Center camera on object for timeline view (horizontal only, use device-specific Y)
-      this.controls.target.set(mesh.position.x, this.targetY, 0);
+      // Center camera on object for timeline view (horizontal only)
+      this.controls.target.set(mesh.position.x, 0, 0);
       this.controls.update();
       
       // Show object details
@@ -1327,12 +1320,12 @@ class SolarSystem {
     const infoContent = document.getElementById('infoContent');
     infoContent.innerHTML = `
       <div class="welcome-message">
-        <h3>Welcome to SpaceHopper</h3>
-        <p>Click on any celestial object to explore detailed information about it.</p>
+        <h3>Welcome to SpaiceHopper</h3>
+        <p>Click on any celestial object in the model above to explore detailed information about it.</p>
         <div class="feature-list">
           <div class="feature-item">
             <span class="feature-icon">🔍</span>
-            <span>Zoom and pan to explore</span>
+            <span>Timeline Navigation: Drag left/right to explore • Scroll to zoom • Click/Tap planets for details • Pinch to zoom on mobile</span>
           </div>
           <div class="feature-item">
             <span class="feature-icon">📊</span>
