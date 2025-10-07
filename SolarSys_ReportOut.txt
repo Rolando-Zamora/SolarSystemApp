@@ -1,0 +1,16 @@
+Application Concept
+SpaiceHopper is an interactive educational web application that transforms solar system exploration into an engaging, multimedia experience. The app features a linear 3D timeline visualization built with Three.js, allowing users to navigate celestial objects including planets, dwarf planets, and the sun. Users can click objects to view detailed information, request AI-generated facts, create visualizations, and now experience narrated content through text-to-speech functionality.
+API Selection and Rationale
+I integrated multiple APIs to create a rich, multi-modal experience:
+•OpenAI GPT-4o-mini: Selected for generating diverse, accurate astronomical facts and answering user questions due to its cost-effectiveness and strong educational content generation
+•DALL-E 3: Chosen for creating artistic planet visualizations that enhance visual learning
+•Google Gemini: Implemented as an alternative AI option for content generation
+•ElevenLabs: Integrated for natural-sounding text-to-speech narration, making content accessible and engaging with voice ID mNNzYJqa2ABD2nl3ndre for consistent audio quality
+•Three.js: Essential for creating the interactive 3D solar system visualization
+Development Challenges
+Key challenges included managing asynchronous API calls, handling timing issues with DOM manipulation (particularly with TTS initialization), implementing proper error handling for API failures, and ensuring responsive design across devices. The TTS feature initially failed because facts text wasn't captured before DOM animations completed, requiring refactoring to store data immediately upon API response.
+Learning Outcomes
+This project deepened my understanding of serverless architecture using Netlify Functions, real-time API integration, state management in vanilla JavaScript, and creating accessible multimedia experiences. I learned the importance of proper error handling and user feedback in API-dependent applications.
+AI-Assisted Development Impact
+Windsurf's AI assistance dramatically accelerated development by generating boilerplate serverless functions, suggesting optimal code patterns, debugging timing issues, and providing immediate solutions for styling challenges. The AI pair-programming approach reduced development time while maintaining code quality and helping me understand complex implementation patterns in real-time.
+There's no doubt that I couldn't have built this app without Cascade. Windsurf offers knowledge, speed, and accuracy I will never be able to attain. It is equivalent to having a team of five employees at your whim, where you are simultaneously the client and product manager. Windsurf is super valuable when getting from 0 to 90% of the product up and running; however, once you have an MVP and you want to optimize or try to perfect the application you enter a stage of marginal return, like using a beautiful rainbow-colored unicorn to power a watermill. It then becomes more valuable for quality control, to ensure that whatever change you want to make considers impact to every other line of code.
