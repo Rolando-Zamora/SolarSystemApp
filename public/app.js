@@ -1581,6 +1581,9 @@ class SolarSystem {
       const data = await response.json();
       
       if (data.success && data.facts) {
+        // Store facts text immediately for TTS
+        this.currentFactsText = data.facts.join('. ');
+        
         // Clear existing facts and add new ones with animation
         factsList.innerHTML = '';
         
@@ -1609,7 +1612,7 @@ class SolarSystem {
         
         // Show TTS controls and initialize
         this.showTTSControls();
-        this.initializeTTS();
+        this.setupTTSButtons();
       } else {
         throw new Error(data.message || 'Failed to generate facts');
       }
@@ -1638,14 +1641,7 @@ class SolarSystem {
     }
   }
 
-  initializeTTS() {
-    // Get all facts text
-    const factsList = document.querySelector('.facts-list');
-    if (!factsList) return;
-    
-    const facts = Array.from(factsList.querySelectorAll('li')).map(li => li.textContent);
-    this.currentFactsText = facts.join('. ');
-    
+  setupTTSButtons() {
     // Set up button listeners
     const startBtn = document.getElementById('ttsStart');
     const stopBtn = document.getElementById('ttsStop');
@@ -1666,6 +1662,13 @@ class SolarSystem {
     if (this.currentAudio && !this.currentAudio.paused) {
       // Resume if paused
       this.currentAudio.play();
+      return;
+    }
+    
+    // Check if there's text to read
+    if (!this.currentFactsText || this.currentFactsText.trim() === '') {
+      console.error('No facts text available for TTS');
+      alert('Please generate facts first before using text-to-speech.');
       return;
     }
     
