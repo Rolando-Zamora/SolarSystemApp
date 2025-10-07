@@ -828,18 +828,18 @@ body::before {
 
 /* TTS Controls */
 .tts-controls {
-  display: flex;
-  gap: 0.5rem;
+  display: flex; /*Makes the buttons sit horizontally in a row*/
+  gap: 0.5rem; /* Space between the three buttons */
   margin-bottom: 1rem;
-  padding: 0.75rem;
+  padding: 0.3rem; /* Inner spacing around all the buttons inside the container*/
   background: rgba(76, 201, 240, 0.05);
   border-radius: var(--radius);
-  border: 1px solid rgba(76, 201, 240, 0.15);
+  border: 1.2px solid rgba(76, 201, 240, 0.15);
 }
 
 .tts-btn {
   flex: 1;
-  padding: 0.3rem 0.5rem;
+  padding: 0.2rem 0.5rem;
   border: none;
   border-radius: calc(var(--radius) - 4px);
   cursor: pointer;
