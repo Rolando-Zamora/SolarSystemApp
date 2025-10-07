@@ -255,6 +255,10 @@ class SolarSystem {
     this.forceRender = true;
     this.animationEnabled = true;
     
+    // TTS state
+    this.currentAudio = null;
+    this.currentFactsText = '';
+    
     try {
       this.init();
       this.initializeAsync();
@@ -1602,6 +1606,10 @@ class SolarSystem {
         setTimeout(() => {
           btn.innerHTML = '<span class="btn-icon">🔄</span> New Facts';
         }, 2000);
+        
+        // Show TTS controls and initialize
+        this.showTTSControls();
+        this.initializeTTS();
       } else {
         throw new Error(data.message || 'Failed to generate facts');
       }
@@ -1614,6 +1622,136 @@ class SolarSystem {
     } finally {
       btn.disabled = false;
     }
+  }
+
+  showTTSControls() {
+    const ttsControls = document.getElementById('ttsControls');
+    if (ttsControls) {
+      ttsControls.style.display = 'flex';
+    }
+  }
+
+  hideTTSControls() {
+    const ttsControls = document.getElementById('ttsControls');
+    if (ttsControls) {
+      ttsControls.style.display = 'none';
+    }
+  }
+
+  initializeTTS() {
+    // Get all facts text
+    const factsList = document.querySelector('.facts-list');
+    if (!factsList) return;
+    
+    const facts = Array.from(factsList.querySelectorAll('li')).map(li => li.textContent);
+    this.currentFactsText = facts.join('. ');
+    
+    // Set up button listeners
+    const startBtn = document.getElementById('ttsStart');
+    const stopBtn = document.getElementById('ttsStop');
+    const restartBtn = document.getElementById('ttsRestart');
+    
+    if (startBtn) {
+      startBtn.onclick = () => this.startTTS();
+    }
+    if (stopBtn) {
+      stopBtn.onclick = () => this.stopTTS();
+    }
+    if (restartBtn) {
+      restartBtn.onclick = () => this.restartTTS();
+    }
+  }
+
+  async startTTS() {
+    if (this.currentAudio && !this.currentAudio.paused) {
+      // Resume if paused
+      this.currentAudio.play();
+      return;
+    }
+    
+    const startBtn = document.getElementById('ttsStart');
+    if (startBtn) {
+      startBtn.disabled = true;
+      startBtn.innerHTML = '<span class="tts-icon">⏳</span> Loading...';
+    }
+    
+    try {
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: this.currentFactsText })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.audio) {
+        // Create audio from base64
+        const audioBlob = this.base64ToBlob(data.audio, 'audio/mpeg');
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        // Stop any existing audio
+        if (this.currentAudio) {
+          this.currentAudio.pause();
+          URL.revokeObjectURL(this.currentAudio.src);
+        }
+        
+        this.currentAudio = new Audio(audioUrl);
+        this.currentAudio.play();
+        
+        // Update button state
+        if (startBtn) {
+          startBtn.innerHTML = '<span class="tts-icon">▶️</span> Playing...';
+        }
+        
+        // Handle audio end
+        this.currentAudio.onended = () => {
+          if (startBtn) {
+            startBtn.innerHTML = '<span class="tts-icon">▶️</span> Start';
+            startBtn.disabled = false;
+          }
+        };
+      } else {
+        throw new Error(data.error || 'Failed to generate speech');
+      }
+    } catch (error) {
+      console.error('Error generating speech:', error);
+      alert('Failed to generate speech. Please check your API key.');
+    } finally {
+      if (startBtn) {
+        startBtn.disabled = false;
+        if (!this.currentAudio || this.currentAudio.paused) {
+          startBtn.innerHTML = '<span class="tts-icon">▶️</span> Start';
+        }
+      }
+    }
+  }
+
+  stopTTS() {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      
+      const startBtn = document.getElementById('ttsStart');
+      if (startBtn) {
+        startBtn.innerHTML = '<span class="tts-icon">▶️</span> Start';
+        startBtn.disabled = false;
+      }
+    }
+  }
+
+  restartTTS() {
+    this.stopTTS();
+    this.startTTS();
+  }
+
+  base64ToBlob(base64, mimeType) {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
   }
 
   updateObjectVisibility() {

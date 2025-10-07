@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
     if (openaiApiKey) {
       console.log(`🧠 Using OpenAI for intelligent response`);
       
-      const systemPrompt = `You are an expert astronomer and space educator. Answer questions about the solar system, planets, moons, and space in an engaging, educational way. Keep responses concise (2-3 sentences) but informative. Use scientific facts and make it interesting for learners.`;
+      const systemPrompt = `You are an expert astronomer and space educator. Answer questions about the solar system, planets, moons, and space in an engaging, educational way. Keep responses concise (2 sentences) but informative. Use scientific facts and make it interesting for learners.`;
       
       const userPrompt = context ? 
         `Question about ${context}: ${question}` : 
