@@ -1709,7 +1709,7 @@ class SolarSystem {
         // Handle audio end
         this.currentAudio.onended = () => {
           if (startBtn) {
-            startBtn.innerHTML = '<span class="tts-icon">▶️</span> Start';
+            startBtn.innerHTML = '<span class="tts-icon">▶️</span> Narrate';
             startBtn.disabled = false;
           }
         };
@@ -1723,7 +1723,7 @@ class SolarSystem {
       if (startBtn) {
         startBtn.disabled = false;
         if (!this.currentAudio || this.currentAudio.paused) {
-          startBtn.innerHTML = '<span class="tts-icon">▶️</span> Start';
+          startBtn.innerHTML = '<span class="tts-icon">▶️</span> Narrate';
         }
       }
     }
@@ -1736,7 +1736,7 @@ class SolarSystem {
       
       const startBtn = document.getElementById('ttsStart');
       if (startBtn) {
-        startBtn.innerHTML = '<span class="tts-icon">▶️</span> Start';
+        startBtn.innerHTML = '<span class="tts-icon">▶️</span> Narrate';
         startBtn.disabled = false;
       }
     }
