@@ -1718,7 +1718,7 @@ class SolarSystem {
       }
     } catch (error) {
       console.error('Error generating speech:', error);
-      alert('Oop! Seems this app is so popular, guests have used up all the free AI Voice credits for this month.'); //Failed to generate speech. Please check your API key.
+      alert('I may need to start charging for these apps! Seems this app is so popular, guests have used up all the free AI Voice credits for this month.'); //Failed to generate speech. Please check your API key.
     } finally {
       if (startBtn) {
         startBtn.disabled = false;
