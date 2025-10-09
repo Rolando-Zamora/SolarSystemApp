@@ -930,7 +930,7 @@ class SolarSystem {
     
     // Clean white text on transparent background
     context.fillStyle = '#ffffff';
-    context.font = 'bold 18px Arial';
+    context.font = 'bold 20px Arial';
     context.textAlign = 'center';
     context.fillText(name, canvas.width / 2, 30);
     
